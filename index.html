@@ -54,6 +54,18 @@
       let spawnInterval = 1200; // milliseconds
       let lastTime = 0;
 
+      // Load images for player and obstacles. These images live in the assets
+      // directory next to this HTML file. They replace the simple colored
+      // rectangles used in the basic version and provide a more engaging
+      // visual experience reminiscent of popular endless runner games.
+      const playerImg = new Image();
+      // The player and obstacle images are expected to live in the same
+      // directory as this HTML file when deployed to GitHub. If you place
+      // them inside an `assets` folder, adjust the paths accordingly.
+      playerImg.src = 'player.png';
+      const obstacleImg = new Image();
+      obstacleImg.src = 'obstacle.png';
+
       // Add keyboard event listeners for left/right movement
       document.addEventListener('keydown', (e) => {
         if (gameOver) {
@@ -71,8 +83,14 @@
       function drawPlayer() {
         const x = playerLane * laneWidth + (laneWidth - playerSize) / 2;
         const y = canvas.height - playerSize - 10;
-        ctx.fillStyle = '#4caf50';
-        ctx.fillRect(x, y, playerSize, playerSize);
+        // Draw the player image if it has finished loading. Until then,
+        // fall back to a colored rectangle so the game remains playable.
+        if (playerImg.complete && playerImg.naturalWidth) {
+          ctx.drawImage(playerImg, x, y, playerSize, playerSize);
+        } else {
+          ctx.fillStyle = '#4caf50';
+          ctx.fillRect(x, y, playerSize, playerSize);
+        }
       }
 
       function spawnObstacle() {
@@ -101,10 +119,16 @@
       }
 
       function drawObstacles() {
-        ctx.fillStyle = '#f44336';
         obstacles.forEach((obs) => {
           const x = obs.lane * laneWidth + (laneWidth - obstacleSize) / 2;
-          ctx.fillRect(x, obs.y, obstacleSize, obstacleSize);
+          // Draw the obstacle image if it has finished loading. Otherwise,
+          // use a simple colored square as a fallback.
+          if (obstacleImg.complete && obstacleImg.naturalWidth) {
+            ctx.drawImage(obstacleImg, x, obs.y, obstacleSize, obstacleSize);
+          } else {
+            ctx.fillStyle = '#f44336';
+            ctx.fillRect(x, obs.y, obstacleSize, obstacleSize);
+          }
         });
       }
 
